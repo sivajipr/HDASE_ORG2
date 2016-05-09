@@ -1,0 +1,46 @@
+<div class="question_area" style="display:none">
+
+</div>
+  <textarea id="anwser_area" name="answer" placeholder="Enter your Answer" style="height:100px; width:500px"></textarea>
+<div class="completed_area">
+
+</div>
+<button type="submit" id="sub_mit" class="btn btn-default answer_submit" style="display:none">Submit</button>
+
+<script>
+$(".answer_submit").on("click",function(){
+	$("#start_button").hide()
+	$("#sub_mit").show()
+	var id = $(".question_area >p").attr("id")
+	$(".question_area").hide()
+	if (document.getElementById('r1').checked) {
+  		answer = document.getElementById('r1').value;
+	}else if(document.getElementById('r2').checked){
+		answer = document.getElementById('r2').value;
+	}else{
+		answer = "no_answer"
+	}
+	var url = "/users/get-question/"
+	$.ajax({
+		url:url,
+		type:'POST',
+		data:{"answer":answer, 'id':id},
+		success: function(data, textStatus, jqXHR) {
+			if(data){
+				$(".question_area").show();
+				$(".question_area").html("");
+	       		$(".question_area").append('<p id='+data.id+'>'+data.question+'</p>');
+			}else{
+				$(".question_area").html("");
+				$(".completed_area").append('<a href="/"><button type="button" class="btn btn-info btn-lg answer_submit" id="start_button">Completed</button></a>');
+				$("#sub_mit").hide()
+			}
+	    },
+	    error: function() {
+	        alert("ajaxfail");
+	    }
+	})
+})
+</script>
+
+{% endblock content %}

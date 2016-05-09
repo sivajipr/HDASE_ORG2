@@ -1,0 +1,37 @@
+{% extends "common.html" %}
+{% block content %}
+<textarea id="asked_question" name="question" placeholder="Enter your question" style="height:161px; width:556px; margin-top:20px"></textarea>
+<button id="ask_button" type="submit">Ok</button>
+<div id="show_answer"></div>
+<div class="spinner" style="display: none">
+        <div class="center">
+            <img alt="" src="/static/images/loader.gif" />
+        </div>
+    </div>
+<script>
+$("#ask_button").on("click", function(){
+	$("#show_answer").html("")
+	question = $("#asked_question").val()
+	var url = "/users/ask-question"
+
+	$.ajax({
+		url:url,
+		type:'POST',
+		data:{"question":question},
+		beforeSend: function () {
+                        $(".spinner").show();
+                    },
+                    complete: function () {
+                        $(".spinner").hide();
+                    },
+		success: function(data, textStatus, jqXHR) {
+			$("#show_answer").append(data.answer);
+
+	    },
+	    error: function() {
+	        alert("ajaxfail");
+	    }
+	})
+})
+</script>
+{% endblock content %}

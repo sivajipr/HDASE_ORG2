@@ -1,0 +1,186 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="container">
+{% if not user.is_authenticated %}
+
+  <!-- Trigger the modal with a button -->
+  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#LoginModal" style="float:right; margin-top:5px">Login</button>
+  <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#SignupModal" style="float:right; margin-right:10px; margin-top:5px">Signup</button>
+  <div class="row" style="margin-top:250px">
+    <div class="col-md-5">
+      <img src="/static/images/new.jpg">
+    </div>
+    <div class="col-md-7">
+        text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text text
+    </div></div>
+
+  <!-- Login Modal -->
+  <div class="modal fade" id="LoginModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <form  method='post' action='/users/log-in'>{% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">LogIn</h4>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+          <input type="email" name="email" class='form-control form-align' placeholder='Enter your email' required>
+        </div>
+
+        <div class="form-group">
+          <input type="password" name="password" class='form-control form-align' placeholder='password' required>
+        </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+      </div>
+    </form>
+      
+    </div>
+  </div>
+  <!-- Login modal ends here -->
+  <!-- Signup Modal -->
+  <div class="modal fade" id="SignupModal" role="dialog">
+    <div class="modal-dialog">
+    
+      <!-- Modal content-->
+      <form  method='post' action='/users/sign-up'>{% csrf_token %}
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">SignUp</h4>
+        </div>
+        <div class="modal-body">
+        	<div class="form-group">
+    			<input type="text" name="first_name" class='form-control form-align' placeholder='Firstname' required>
+   			</div>
+
+  			<div class="form-group">
+    			<input type="text" name="last_name" class='form-control form-align' placeholder='Lastname' required>
+    		</div>
+
+  			<div class="form-group">
+				<input type="email" name="email" class='form-control form-align' placeholder='Email' required>
+  			</div>
+
+  			<div class="form-group">
+    			<input type="text" name="phone_number" class='form-control form-align' placeholder='phone number' required>
+  			</div>
+
+  			<div class="form-group">
+          <div class="radio">
+    			<label><input type="radio" name="gender-radio" value="male" />Male</label>
+          <label><input type="radio" name="gender-radio" value="female" />Female</label>
+        </div>
+    		</div>
+
+  			<div class="form-group">
+    			<input name="password1" type="password" class='form-control form-align' placeholder='Password' required>
+    		</div>
+
+        <div class="form-group">
+          <input name="password2" type="password" class='form-control form-align' placeholder='Re enter your password' required>
+        </div>
+
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-default">Submit</button>
+        </div>
+      </div>
+    </form>
+      
+    </div>
+  </div>
+  <!-- Signup modal ends here -->
+  
+{% else %}
+<a href="/users/log-out/"><button type="button" class="btn btn-info btn-lg" style="float:right; margin-top:5px">Logout</button></a>
+<button type="button" class="btn btn-info btn-lg" id="start_button" style="float:right; margin-right:10px; margin-top:5px">Start Question</button>
+<a href="users/ask-question"><button type="button" class="btn btn-info btn-lg" style="float:right; margin-right:10px; margin-top:5px">Ask Question</button></a>
+
+<div class="row" style="margin-top:200px">
+  <div class="question_area" style="display:none">
+
+  </div>
+  <textarea id="answer_area" name="answer" placeholder="Enter your Answer" style="height:100px; width:500px; display:none"></textarea>
+<button type="submit" id="sub_mit" class="btn btn-default answer_submit" style="display:none">Submit</button>
+</div>
+<div id="best_courses"></div>
+<script>
+$("#sub_mit").on("click",function(){
+  $("#answer_area").show()
+  $("#sub_mit").show()
+  $("#best_courses").html("")
+  
+  var id = $(".question_area >h3 >p").attr("id")
+  var answer = $('#answer_area').val()
+  $(".question_area").html("")
+  $("#answer_area").val("")
+  var url = "/users/get-question/"
+  $.ajax({
+    url:url,
+    type:'POST',
+    data:{"answer":answer, 'id':id},
+    success: function(data, textStatus, jqXHR) {
+      if(data.question){
+        console.log('llllll')
+        $(".question_area").show();
+        $(".question_area").html("");
+        $("#best_courses").html("")
+
+            $(".question_area").append('<h3><p id='+data.id+'>'+data.question+'</p></h3>');
+      }else{
+        console.log('kkkkkkkkkk')
+        $(".question_area").html("");
+        $("#answer_area").hide();
+        $("#sub_mit").hide();
+        console.log(data)
+        console.log(data.length)
+        if (data.length == 1){
+          $("#best_courses").append("<div>This is the best course for you </div><li>"+data[0].name+"</li>")
+        }else{
+        $("#best_courses").append("<div>These are the best courses for you </div>")
+        for (i=0;i<data.length;i++){
+          $("#best_courses").append("<li>"+data[i].name+"</li>")
+        }
+        }
+      }
+      },
+      error: function() {
+          alert("ajaxfail");
+      }
+  })
+})
+$("#start_button").on("click",function(){
+    $("#answer_area").show()
+    $("#sub_mit").show()
+    $(".question_area").html("")
+    $("#best_courses").html("")
+    var url = "/users/first-attempt/"
+    $.ajax({
+    url:url,
+    type:'POST',
+    success: function(data, textStatus, jqXHR) {
+      if(data){
+        $(".question_area").show();
+            $(".question_area").append('<h3><p id='+data.question_id+'>'+data.question+'</p></h3>');
+      }else{
+        $(".question_area").html("");
+        $("#sub_mit").hide()
+        swal("Yaah","You are completed", "success");
+      }
+      },
+      error: function() {
+          alert("ajaxfail");
+      }
+  })
+  });
+</script>
+
+{% endif %}
+</div>
+{% endblock content %}
